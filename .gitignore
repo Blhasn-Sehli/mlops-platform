@@ -1,0 +1,44 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (versioned by DVC, not Git)
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+
+# Models
+models/*
+!models/.gitkeep
+
+# MLFlow
+mlruns/
+mlflow/mlruns/
+
+# Environment variables
+.env
+*.env
+
+# Docker
+*.tar
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# DVC (keep config, ignore cache)
+.dvc/cache/
+.dvc/tmp/
