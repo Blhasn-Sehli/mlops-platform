@@ -5,6 +5,7 @@ import numpy as np
 import os
 from prometheus_fastapi_instrumentator import Instrumentator
 
+
 # Load the trained model
 MODEL_PATH = "models/random_forest.pkl"
 
@@ -23,7 +24,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Prometheus metrics
 Instrumentator().instrument(app).expose(app)
 
 # Input schema
@@ -65,8 +65,8 @@ def predict(request: PredictionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/model-info")
-def model_info():
+@app.get("/metrics")
+def metrics():
     return {
         "model": "RandomForestClassifier",
         "features": 4,
