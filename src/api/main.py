@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import joblib
 import numpy as np
 import os
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Load the trained model
 MODEL_PATH = "models/random_forest.pkl"
@@ -21,6 +22,9 @@ app = FastAPI(
     description="REST API for Iris flower classification",
     version="1.0.0"
 )
+
+# Prometheus metrics
+Instrumentator().instrument(app).expose(app)
 
 # Input schema
 class PredictionRequest(BaseModel):
@@ -61,8 +65,8 @@ def predict(request: PredictionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/metrics")
-def metrics():
+@app.get("/model-info")
+def model_info():
     return {
         "model": "RandomForestClassifier",
         "features": 4,
