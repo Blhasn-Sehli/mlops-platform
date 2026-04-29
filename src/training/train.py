@@ -1,4 +1,5 @@
 import mlflow
+import mlflow.sklearn
 from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -6,8 +7,9 @@ from sklearn.metrics import accuracy_score, f1_score
 import joblib
 import os
 
-# Connect to your local MLFlow server
-mlflow.set_tracking_uri("http://localhost:5000")
+# Use env variable if set, otherwise fall back to local file tracking
+MLFLOW_URI = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")
+mlflow.set_tracking_uri(MLFLOW_URI)
 mlflow.set_experiment("iris-classification")
 
 # Load data
