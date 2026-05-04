@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"c:\\\\Users\\\\Hp\\\\Desktop\\\\mlops-platform\\\\projet_complexe.pdf\")",
+      "Bash(git add *)",
+      "Bash(python -m pre_commit run --all-files)",
+      "Bash(python -m pre_commit clean)",
+      "PowerShell(python --version)",
+      "PowerShell(python -c \"import pre_commit; print\\(pre_commit.__file__\\)\" 2>&1)",
+      "PowerShell($env:PRE_COMMIT_HOME)"
+    ]
+  }
+}
