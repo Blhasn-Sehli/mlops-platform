@@ -1,0 +1,83 @@
+global:
+  resolve_timeout: 5m
+  # smtp_smarthost: 'smtp.gmail.com:587'   # uncomment to enable email
+  # smtp_from: 'alerts@yourcompany.com'
+  # smtp_auth_username: 'alerts@yourcompany.com'
+  # smtp_auth_password: 'YOUR_APP_PASSWORD'
+
+# ── Routing ──────────────────────────────────────────────────────────────────
+route:
+  group_by: ["alertname", "severity"]
+  group_wait: 30s        # wait before sending the first alert in a group
+  group_interval: 5m     # wait before sending a new group notification
+  repeat_interval: 1h    # repeat firing alerts every hour
+  receiver: "default"
+
+  routes:
+    # Critical alerts go to the critical receiver immediately
+    - matchers:
+        - severity = "critical"
+      receiver: "critical"
+      group_wait: 10s
+      repeat_interval: 15m
+
+    # Warnings go to the default receiver
+    - matchers:
+        - severity = "warning"
+      receiver: "default"
+
+# ── Receivers ────────────────────────────────────────────────────────────────
+receivers:
+  - name: "default"
+    # ── Slack (uncomment and fill YOUR_SLACK_WEBHOOK_URL) ──────────────────
+    # slack_configs:
+    #   - api_url: 'YOUR_SLACK_WEBHOOK_URL'
+    #     channel: '#mlops-alerts'
+    #     title: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
+    #     text: >-
+    #       {{ range .Alerts }}
+    #         *Alert:* {{ .Annotations.summary }}
+    #         *Description:* {{ .Annotations.description }}
+    #         *Severity:* {{ .Labels.severity }}
+    #       {{ end }}
+    #     send_resolved: true
+
+    # ── Email (uncomment after configuring smtp_* above) ───────────────────
+    # email_configs:
+    #   - to: 'team@yourcompany.com'
+    #     subject: '[MLOps] {{ .GroupLabels.alertname }}'
+    #     body: |
+    #       {{ range .Alerts }}
+    #         Alert: {{ .Annotations.summary }}
+    #         {{ .Annotations.description }}
+    #       {{ end }}
+    #     send_resolved: true
+
+    # ── Webhook (generic — works with any HTTP endpoint) ───────────────────
+    webhook_configs:
+      - url: "http://localhost:9999/alerts"  # replace with your endpoint
+        send_resolved: true
+
+  - name: "critical"
+    # Duplicate critical alerts to a dedicated channel / pager
+    # pagerduty_configs:
+    #   - service_key: 'YOUR_PAGERDUTY_KEY'
+    webhook_configs:
+      - url: "http://localhost:9999/alerts/critical"
+        send_resolved: true
+
+# ── Inhibition ───────────────────────────────────────────────────────────────
+# If APIDown fires, suppress all other API alerts (they are consequences, not causes)
+inhibit_rules:
+  - source_matchers:
+      - alertname = "APIDown"
+    target_matchers:
+      - team = "mlops"
+    equal: []
+
+  # If a critical fires, suppress the warning of the same alert
+  - source_matchers:
+      - severity = "critical"
+    target_matchers:
+      - severity = "warning"
+    equal: ["alertname"]

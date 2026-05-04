@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlops-api
+  namespace: mlops
+  labels:
+    app: mlops-api
+    app.kubernetes.io/part-of: mlops-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mlops-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0   # zero-downtime deployments
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: mlops-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: api
+          # Replace with your GHCR image after the CI push-image job runs
+          image: ghcr.io/YOUR_ORG/mlops-platform/mlops-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+
+          envFrom:
+            - configMapRef:
+                name: mlops-config
+
+          env:
+            # API key injected from a Kubernetes Secret (never store in ConfigMap)
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mlops-secrets
+                  key: api-key
+                  optional: true   # auth is disabled when secret is absent
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+
+          # Readiness: only send traffic once the model is loaded
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+
+          # Liveness: restart the pod if the API becomes unresponsive
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+
+          volumeMounts:
+            - name: predictions-storage
+              mountPath: /app/monitoring
+
+      volumes:
+        - name: predictions-storage
+          persistentVolumeClaim:
+            claimName: predictions-pvc

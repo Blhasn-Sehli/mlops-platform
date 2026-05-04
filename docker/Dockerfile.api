@@ -5,10 +5,12 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy entire src package (api + config + data + monitoring + logging_config)
+COPY src/ ./src/
 COPY models/ ./models/
-COPY src/api/ ./src/api/
-COPY src/__init__.py ./src/
-COPY src/api/__init__.py ./src/api/
+
+# Ensure monitoring directory exists for SQLite prediction log
+RUN mkdir -p monitoring
 
 EXPOSE 8000
 

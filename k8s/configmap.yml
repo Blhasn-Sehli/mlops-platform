@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mlops-config
+  namespace: mlops
+data:
+  MLFLOW_TRACKING_URI: "http://mlflow-service.mlops.svc.cluster.local:5000"
+  MLFLOW_MODEL_NAME: "iris-random-forest"
+  MLFLOW_MODEL_ALIAS: "champion"
+  LOG_LEVEL: "INFO"
+  PREDICTIONS_DB_URL: "sqlite:///monitoring/predictions.db"
+  DRIFT_REPORTS_DIR: "monitoring/reports"
