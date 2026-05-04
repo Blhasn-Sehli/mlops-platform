@@ -833,6 +833,8 @@ pre-commit install
 
 # Entraîner le modèle (Pipeline StandardScaler+RF, grid search, MLFlow Registry)
 python src/training/train.py
+# ou
+python -m src.training.train
 
 # ── Tests ────────────────────────────────────────────────────────────────────
 

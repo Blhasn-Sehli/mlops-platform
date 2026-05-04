@@ -128,7 +128,8 @@ app = FastAPI(
     version="1.0.0",
 )
 
-Instrumentator().instrument(app).expose(app)
+# Expose Prometheus metrics at /metrics (text/plain — required by Prometheus scraper)
+Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -211,8 +212,10 @@ def health():
     }
 
 
-@app.get("/metrics")
-def metrics():
+# Renamed from /metrics to /info to avoid conflict with the Prometheus scrape endpoint.
+# /metrics is now reserved for prometheus_fastapi_instrumentator (text/plain format).
+@app.get("/info")
+def info():
     return {
         "model": "Pipeline(StandardScaler + RandomForestClassifier)",
         "features": 4,
@@ -371,8 +374,14 @@ def explain(request: ExplainRequest):
         features_for_shap = _pipeline_scaler.transform(features) if _pipeline_scaler else features
         shap_vals = explainer.shap_values(features_for_shap)
 
-        # For multiclass RF, shap_values is a list [class_0_array, class_1_array, class_2_array]
-        class_shap = shap_vals[class_id][0] if isinstance(shap_vals, list) else shap_vals[0]
+        # SHAP < 0.40: list of (n_samples, n_features) arrays, one per class
+        # SHAP >= 0.40: single (n_samples, n_features, n_classes) array
+        if isinstance(shap_vals, list):
+            class_shap = shap_vals[class_id][0]
+        elif shap_vals.ndim == 3:
+            class_shap = shap_vals[0, :, class_id]
+        else:
+            class_shap = shap_vals[0]
 
         return ExplainResponse(
             prediction=CLASSES[class_id],

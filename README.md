@@ -20,7 +20,7 @@ Une plateforme complète **MLOps** pour la classification des fleurs Iris avec s
 
 ## 🎯 Vue d'ensemble
 
-Ce projet implémente une **pipeline MLOps complète** pour entraîner, déployer et monitorer un modèle de classification d'Iris (Random Forest). 
+Ce projet implémente une **pipeline MLOps complète** pour entraîner, déployer et monitorer un modèle de classification d'Iris (Random Forest).
 
 **Caractéristiques principales:**
 - ✅ Entraînement automatisé avec MLflow

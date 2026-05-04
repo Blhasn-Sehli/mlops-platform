@@ -2,7 +2,7 @@ services:
 
   # ── MLFlow tracking server ───────────────────────────────────────────────
   mlflow:
-    image: ghcr.io/mlflow/mlflow:v2.11.0
+    image: ghcr.io/mlflow/mlflow:v3.11.1
     container_name: mlflow_server
     ports:
       - "5000:5000"
@@ -13,7 +13,9 @@ services:
       --host 0.0.0.0
       --port 5000
       --backend-store-uri sqlite:////mlflow/mlflow.db
-      --default-artifact-root /mlflow/artifacts
+      --artifacts-destination /mlflow/artifacts
+      --serve-artifacts
+      --allowed-hosts "*"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/health')\" || exit 1"]
       interval: 15s
@@ -34,16 +36,19 @@ services:
       - MLFLOW_MODEL_NAME=iris-random-forest
       - MLFLOW_MODEL_ALIAS=champion
       - LOG_LEVEL=INFO
+      - AB_TRAFFIC_SPLIT=0.2
     volumes:
       - predictions_data:/app/monitoring  # persist SQLite prediction log
+      - mlflow_data:/mlflow:ro            # read MLflow artifacts (same volume as mlflow service)
     depends_on:
       mlflow:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 15s
+      timeout: 10s
       retries: 5
+      start_period: 30s
 
   # ── Prometheus ───────────────────────────────────────────────────────────
   prometheus:

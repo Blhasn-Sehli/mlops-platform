@@ -17,9 +17,9 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-from evidently import ColumnMapping
-from evidently.metric_preset import DataDriftPreset, DataQualityPreset
-from evidently.report import Report
+from evidently.legacy.metric_preset import DataDriftPreset, DataQualityPreset
+from evidently.legacy.pipeline.column_mapping import ColumnMapping
+from evidently.legacy.report import Report
 from sklearn.datasets import load_iris
 
 from src.config import settings

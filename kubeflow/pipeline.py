@@ -16,6 +16,8 @@ Submit (requires a running KFP cluster):
                    --pipeline-package-path iris_mlops_pipeline.yaml
 """
 
+from typing import NamedTuple
+
 from kfp import compiler, dsl
 from kfp.dsl import Dataset, Input, Metrics, Model, Output, component, pipeline
 
@@ -122,8 +124,10 @@ def evaluate_model(
     input_test: Input[Dataset],
     metrics: Output[Metrics],
     accuracy_threshold: float = 0.90,
-) -> bool:
+) -> NamedTuple("Outputs", [("approved", bool)]):
     """Evaluate model on test set; returns True if above threshold."""
+    from collections import namedtuple
+
     import joblib
     import pandas as pd
     from sklearn.metrics import accuracy_score, f1_score
@@ -147,7 +151,7 @@ def evaluate_model(
     print(f"F1 Score : {f1:.4f}")
     print(f"Promoted : {accuracy >= accuracy_threshold}")
 
-    return accuracy >= accuracy_threshold
+    return namedtuple("Outputs", ["approved"])(accuracy >= accuracy_threshold)
 
 
 # ---------------------------------------------------------------------------
@@ -202,7 +206,7 @@ def register_model(
 
 @pipeline(
     name="iris-mlops-pipeline",
-    description="End-to-end MLOps pipeline: load → train → evaluate → register",
+    description="End-to-end MLOps pipeline: load -> train -> evaluate -> register",
 )
 def iris_pipeline(
     mlflow_tracking_uri: str = "http://mlflow:5000",
@@ -224,8 +228,7 @@ def iris_pipeline(
         accuracy_threshold=accuracy_threshold,
     )
 
-    # Conditional registration — only if evaluate_model returns True
-    with dsl.If(eval_task.output, name="above-threshold"):
+    with dsl.If(eval_task.outputs["approved"], name="above-threshold"):
         register_model(
             input_model=train_task.outputs["output_model"],
             mlflow_tracking_uri=mlflow_tracking_uri,

@@ -1,4 +1,5 @@
 # Python
+/venv/
 .venv/
 __pycache__/
 *.pyc
@@ -38,6 +39,14 @@ mlflow/mlruns/
 # OS
 .DS_Store
 Thumbs.db
+
+# Monitoring reports and DB (generated artifacts, not source)
+monitoring/reports/
+monitoring/predictions.db
+
+# Coverage
+.coverage
+htmlcov/
 
 # DVC (keep config, ignore cache)
 .dvc/cache/

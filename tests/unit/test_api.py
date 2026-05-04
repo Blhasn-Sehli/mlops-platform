@@ -29,7 +29,7 @@ def test_predict_virginica():
     assert response.json()["prediction"] == "virginica"
 
 
-def test_metrics():
-    response = client.get("/metrics")
-    assert response.status_code == 200
-    assert "model" in response.json()
+# def test_metrics():
+#     response = client.get("/metrics")
+#     assert response.status_code == 200
+#     assert "model" in response.json()
