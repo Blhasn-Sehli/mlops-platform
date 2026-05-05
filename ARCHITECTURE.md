@@ -878,6 +878,12 @@ curl -X POST http://localhost:8000/explain \
      -H "Content-Type: application/json" \
      -d '{"sepal_length":5.1,"sepal_width":3.5,"petal_length":1.4,"petal_width":0.2}'
 
+#Just to Simulate an  5XX  status for gafana
+     curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -H "X-Force-500: 1" \
+  -d "{\"sepal_length\":5.1,\"sepal_width\":3.5,\"petal_length\":1.4,\"petal_width\":0.2}"
+
 # Statistiques des prédictions loguées
 curl http://localhost:8000/stats
 

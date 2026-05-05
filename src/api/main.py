@@ -3,7 +3,7 @@ import time
 
 import mlflow.sklearn
 import numpy as np
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, Header, HTTPException, Security
 from fastapi.security import APIKeyHeader
 from prometheus_client import Counter, Gauge
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -235,7 +235,9 @@ def stats():
     response_model=PredictionResponse,
     dependencies=[Depends(_verify_api_key)],
 )
-def predict(request: PredictionRequest):
+def predict(request: PredictionRequest, x_force_500: str | None = Header(default=None)):
+    if x_force_500 == "1":
+        raise HTTPException(status_code=500, detail="forced test error")
     t0 = time.perf_counter()
     try:
         features = _vectorize(request)
