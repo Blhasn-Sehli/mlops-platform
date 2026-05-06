@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/mlops-api
+  IMAGE_NAME: blhasn-sehli/mlops-platform/mlops-api
 
 # ── Job 1: Test ────────────────────────────────────────────────────────────────
 jobs:
