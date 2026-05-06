@@ -22,8 +22,8 @@ from kfp import compiler, dsl
 from kfp.dsl import Dataset, Input, Metrics, Model, Output, component, pipeline
 
 BASE_IMAGE = "python:3.11-slim"
-SKLEARN_PACKAGES = ["scikit-learn==1.8.0", "pandas==2.3.3", "numpy==2.4.4", "joblib==1.5.3"]
-MLFLOW_PACKAGES = ["mlflow==3.11.1"]
+SKLEARN_PACKAGES = ["scikit-learn==1.4.2", "pandas==2.1.4", "numpy==1.26.4", "joblib==1.3.2"]
+MLFLOW_PACKAGES = ["mlflow==2.13.0"]
 
 
 # ---------------------------------------------------------------------------
@@ -228,7 +228,7 @@ def iris_pipeline(
         accuracy_threshold=accuracy_threshold,
     )
 
-    with dsl.If(eval_task.outputs["approved"], name="above-threshold"):
+    with dsl.Condition(eval_task.outputs["approved"]):
         register_model(
             input_model=train_task.outputs["output_model"],
             mlflow_tracking_uri=mlflow_tracking_uri,

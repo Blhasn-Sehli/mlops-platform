@@ -28,7 +28,7 @@ spec:
       containers:
         - name: api
           # Replace with your GHCR image after the CI push-image job runs
-          image: ghcr.io/YOUR_ORG/mlops-platform/mlops-api:latest
+          image: ghcr.io/blhasn-sehli/mlops-platform/mlops-api:latestt
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

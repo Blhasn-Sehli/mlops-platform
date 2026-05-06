@@ -145,23 +145,23 @@ mlops-platform/
 
 **Classe `Settings(BaseSettings)`**
 
-| Champ | Type | Défaut | Env var |
-|---|---|---|---|
-| `mlflow_tracking_uri` | `str` | `file:./mlruns` | `MLFLOW_TRACKING_URI` |
-| `mlflow_model_name` | `str` | `iris-random-forest` | `MLFLOW_MODEL_NAME` |
-| `mlflow_model_alias` | `str` | `champion` | `MLFLOW_MODEL_ALIAS` |
-| `mlflow_challenger_alias` | `str` | `challenger` | `MLFLOW_CHALLENGER_ALIAS` |
-| `ab_traffic_split` | `float` | `0.0` | `AB_TRAFFIC_SPLIT` |
-| `accuracy_threshold` | `float` | `0.90` | `ACCURACY_THRESHOLD` |
-| `fallback_model_path` | `str` | `models/random_forest.pkl` | `FALLBACK_MODEL_PATH` |
-| `test_size` | `float` | `0.20` | `TEST_SIZE` |
-| `random_state` | `int` | `42` | `RANDOM_STATE` |
-| `api_host` | `str` | `0.0.0.0` | `API_HOST` |
-| `api_port` | `int` | `8000` | `API_PORT` |
-| `log_level` | `str` | `INFO` | `LOG_LEVEL` |
-| `api_key` | `str \| None` | `None` | `API_KEY` |
-| `predictions_db_url` | `str` | `sqlite:///monitoring/predictions.db` | `PREDICTIONS_DB_URL` |
-| `drift_reports_dir` | `str` | `monitoring/reports` | `DRIFT_REPORTS_DIR` |
+| Champ                     | Type          | Défaut                                | Env var                   |
+| ------------------------- | ------------- | ------------------------------------- | ------------------------- |
+| `mlflow_tracking_uri`     | `str`         | `file:./mlruns`                       | `MLFLOW_TRACKING_URI`     |
+| `mlflow_model_name`       | `str`         | `iris-random-forest`                  | `MLFLOW_MODEL_NAME`       |
+| `mlflow_model_alias`      | `str`         | `champion`                            | `MLFLOW_MODEL_ALIAS`      |
+| `mlflow_challenger_alias` | `str`         | `challenger`                          | `MLFLOW_CHALLENGER_ALIAS` |
+| `ab_traffic_split`        | `float`       | `0.0`                                 | `AB_TRAFFIC_SPLIT`        |
+| `accuracy_threshold`      | `float`       | `0.90`                                | `ACCURACY_THRESHOLD`      |
+| `fallback_model_path`     | `str`         | `models/random_forest.pkl`            | `FALLBACK_MODEL_PATH`     |
+| `test_size`               | `float`       | `0.20`                                | `TEST_SIZE`               |
+| `random_state`            | `int`         | `42`                                  | `RANDOM_STATE`            |
+| `api_host`                | `str`         | `0.0.0.0`                             | `API_HOST`                |
+| `api_port`                | `int`         | `8000`                                | `API_PORT`                |
+| `log_level`               | `str`         | `INFO`                                | `LOG_LEVEL`               |
+| `api_key`                 | `str \| None` | `None`                                | `API_KEY`                 |
+| `predictions_db_url`      | `str`         | `sqlite:///monitoring/predictions.db` | `PREDICTIONS_DB_URL`      |
+| `drift_reports_dir`       | `str`         | `monitoring/reports`                  | `DRIFT_REPORTS_DIR`       |
 
 **Fonction `get_settings() → Settings`**
 
@@ -198,28 +198,28 @@ log.info("prediction", prediction="setosa", confidence=0.97, latency_ms=1.2)
 
 **Rôle** : Charge et valide les données brutes avant tout traitement.
 
-| Fonction | Signature | Description |
-|---|---|---|
-| `load_from_sklearn` | `() → pd.DataFrame` | Charge le dataset Iris depuis scikit-learn. Utilisé en dev, CI et Kubeflow. |
-| `load_from_csv` | `(path: str\|Path) → pd.DataFrame` | Charge depuis un CSV, appelle `validate()` automatiquement. Lève `FileNotFoundError` si le fichier est absent. |
-| `validate` | `(df: pd.DataFrame) → None` | Orchestrateur des 5 checks. Lève `ValueError` au premier échec. |
-| `_check_not_empty` | privée | Vérifie `len(df) > 0`. |
-| `_check_required_columns` | privée | Vérifie que les 4 colonnes features sont présentes. |
-| `_check_numeric_types` | privée | Vérifie que chaque feature est de type numérique. |
-| `_check_no_nulls` | privée | Vérifie qu'aucune valeur nulle n'est présente dans les features. |
-| `_check_value_bounds` | privée | Vérifie que chaque feature est dans `]0, 50]` cm (bornes Iris). |
+| Fonction                  | Signature                          | Description                                                                                                    |
+| ------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `load_from_sklearn`       | `() → pd.DataFrame`                | Charge le dataset Iris depuis scikit-learn. Utilisé en dev, CI et Kubeflow.                                    |
+| `load_from_csv`           | `(path: str\|Path) → pd.DataFrame` | Charge depuis un CSV, appelle `validate()` automatiquement. Lève `FileNotFoundError` si le fichier est absent. |
+| `validate`                | `(df: pd.DataFrame) → None`        | Orchestrateur des 5 checks. Lève `ValueError` au premier échec.                                                |
+| `_check_not_empty`        | privée                             | Vérifie `len(df) > 0`.                                                                                         |
+| `_check_required_columns` | privée                             | Vérifie que les 4 colonnes features sont présentes.                                                            |
+| `_check_numeric_types`    | privée                             | Vérifie que chaque feature est de type numérique.                                                              |
+| `_check_no_nulls`         | privée                             | Vérifie qu'aucune valeur nulle n'est présente dans les features.                                               |
+| `_check_value_bounds`     | privée                             | Vérifie que chaque feature est dans `]0, 50]` cm (bornes Iris).                                                |
 
 #### `src/data/preprocessing.py`
 
 **Rôle** : Utilitaires de preprocessing réutilisables en entraînement, en Kubeflow et en inférence.
 
-| Fonction | Signature | Description |
-|---|---|---|
-| `build_preprocessing_pipeline` | `() → Pipeline` | Retourne un `Pipeline([("scaler", StandardScaler())])` non fitté. |
-| `split` | `(df, test_size, random_state) → (X_train, X_test, y_train, y_test)` | Split stratifié selon les paramètres de `settings`. |
-| `features_to_array` | `(row: dict) → np.ndarray` | Convertit un dict de features en tableau `(1, 4)` pour inférence. |
-| `describe_features` | `(df: pd.DataFrame) → dict` | Retourne mean, std, min, q25, median, q75, max par feature. |
-| `class_distribution` | `(df: pd.DataFrame) → dict` | Retourne `{class_id: count}` depuis la colonne `TARGET_NAME`. |
+| Fonction                       | Signature                                                            | Description                                                       |
+| ------------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `build_preprocessing_pipeline` | `() → Pipeline`                                                      | Retourne un `Pipeline([("scaler", StandardScaler())])` non fitté. |
+| `split`                        | `(df, test_size, random_state) → (X_train, X_test, y_train, y_test)` | Split stratifié selon les paramètres de `settings`.               |
+| `features_to_array`            | `(row: dict) → np.ndarray`                                           | Convertit un dict de features en tableau `(1, 4)` pour inférence. |
+| `describe_features`            | `(df: pd.DataFrame) → dict`                                          | Retourne mean, std, min, q25, median, q75, max par feature.       |
+| `class_distribution`           | `(df: pd.DataFrame) → dict`                                          | Retourne `{class_id: count}` depuis la colonne `TARGET_NAME`.     |
 
 #### `src/data/prediction_logger.py`
 
@@ -227,27 +227,27 @@ log.info("prediction", prediction="setosa", confidence=0.97, latency_ms=1.2)
 
 **Modèle SQLAlchemy `PredictionRecord`**
 
-| Colonne | Type SQL | Description |
-|---|---|---|
-| `id` | INTEGER PK | Auto-increment |
-| `timestamp` | DATETIME | UTC, généré automatiquement |
-| `sepal_length/width` | REAL | Features d'entrée |
-| `petal_length/width` | REAL | Features d'entrée |
-| `prediction` | TEXT | Nom de classe (`"setosa"`, …) |
-| `class_id` | INTEGER | Index de classe (0, 1, 2) |
-| `confidence` | REAL | Probabilité de la classe prédite |
-| `model_source` | TEXT | URI registry ou `"local"` |
-| `latency_ms` | REAL | Temps de traitement en ms (NULL pour batch) |
+| Colonne              | Type SQL   | Description                                 |
+| -------------------- | ---------- | ------------------------------------------- |
+| `id`                 | INTEGER PK | Auto-increment                              |
+| `timestamp`          | DATETIME   | UTC, généré automatiquement                 |
+| `sepal_length/width` | REAL       | Features d'entrée                           |
+| `petal_length/width` | REAL       | Features d'entrée                           |
+| `prediction`         | TEXT       | Nom de classe (`"setosa"`, …)               |
+| `class_id`           | INTEGER    | Index de classe (0, 1, 2)                   |
+| `confidence`         | REAL       | Probabilité de la classe prédite            |
+| `model_source`       | TEXT       | URI registry ou `"local"`                   |
+| `latency_ms`         | REAL       | Temps de traitement en ms (NULL pour batch) |
 
 **Classe `PredictionLogger`**
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `__init__` | `(db_url: str)` | Crée le dossier parent SQLite si absent. Crée la table si elle n'existe pas (`create_all`). |
-| `log` | `(features, prediction, class_id, confidence, model_source, latency_ms) → None` | Insère une ligne. Les exceptions sont silencieuses — ne crashe jamais l'API. |
-| `get_recent` | `(limit: int) → list[dict]` | Retourne les N dernières prédictions triées par timestamp desc. Format compatible avec `DriftDetector.build_current_data()`. |
-| `stats` | `() → dict` | Retourne `{total_predictions, avg_confidence, avg_latency_ms, class_distribution}` via requêtes SQL agrégées. |
-| `count` | `() → int` | Compte rapide du total de prédictions. Affiché dans `/health`. |
+| Méthode      | Signature                                                                       | Description                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `__init__`   | `(db_url: str)`                                                                 | Crée le dossier parent SQLite si absent. Crée la table si elle n'existe pas (`create_all`).                                  |
+| `log`        | `(features, prediction, class_id, confidence, model_source, latency_ms) → None` | Insère une ligne. Les exceptions sont silencieuses — ne crashe jamais l'API.                                                 |
+| `get_recent` | `(limit: int) → list[dict]`                                                     | Retourne les N dernières prédictions triées par timestamp desc. Format compatible avec `DriftDetector.build_current_data()`. |
+| `stats`      | `() → dict`                                                                     | Retourne `{total_predictions, avg_confidence, avg_latency_ms, class_distribution}` via requêtes SQL agrégées.                |
+| `count`      | `() → int`                                                                      | Compte rapide du total de prédictions. Affiché dans `/health`.                                                               |
 
 ---
 
@@ -257,17 +257,17 @@ log.info("prediction", prediction="setosa", confidence=0.97, latency_ms=1.2)
 
 **Flux d'exécution (script top-level)**
 
-| Étape | Ce qui se passe |
-|---|---|
-| **Config** | Lit tout depuis `settings` (MLFlow URI, seuil, test_size, random_state) |
-| **Données** | `load_iris()` → `train_test_split()` (80/20, seed=42) |
-| **Pipeline** | `Pipeline([("scaler", StandardScaler()), ("classifier", RandomForest())])` |
-| **Grid Search** | `GridSearchCV` sur `classifier__n_estimators ∈ {50,100,200}` et `classifier__max_depth ∈ {3,5,10}`, cv=5, n_jobs=-1 (45 fits) |
-| **Évaluation** | `accuracy_score()` + `f1_score(average="weighted")` sur le test set |
-| **MLFlow logging** | `log_params()` (clés `classifier__*`), `log_metric()`, `set_tag(model_type, dataset)` |
-| **Registry** | `mlflow.sklearn.log_model(..., registered_model_name=MODEL_NAME)` — le Pipeline complet (scaler + classifieur) est enregistré |
-| **Fallback** | `joblib.dump(best_pipeline, fallback_model_path)` — le même Pipeline en `.pkl` |
-| **Promotion** | `MlflowClient.search_model_versions()` → `set_registered_model_alias("champion", version)` si accuracy ≥ seuil. Log structuré du résultat. |
+| Étape              | Ce qui se passe                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Config**         | Lit tout depuis `settings` (MLFlow URI, seuil, test_size, random_state)                                                                    |
+| **Données**        | `load_iris()` → `train_test_split()` (80/20, seed=42)                                                                                      |
+| **Pipeline**       | `Pipeline([("scaler", StandardScaler()), ("classifier", RandomForest())])`                                                                 |
+| **Grid Search**    | `GridSearchCV` sur `classifier__n_estimators ∈ {50,100,200}` et `classifier__max_depth ∈ {3,5,10}`, cv=5, n_jobs=-1 (45 fits)              |
+| **Évaluation**     | `accuracy_score()` + `f1_score(average="weighted")` sur le test set                                                                        |
+| **MLFlow logging** | `log_params()` (clés `classifier__*`), `log_metric()`, `set_tag(model_type, dataset)`                                                      |
+| **Registry**       | `mlflow.sklearn.log_model(..., registered_model_name=MODEL_NAME)` — le Pipeline complet (scaler + classifieur) est enregistré              |
+| **Fallback**       | `joblib.dump(best_pipeline, fallback_model_path)` — le même Pipeline en `.pkl`                                                             |
+| **Promotion**      | `MlflowClient.search_model_versions()` → `set_registered_model_alias("champion", version)` si accuracy ≥ seuil. Log structuré du résultat. |
 
 > **Pourquoi le Pipeline ?** Le `StandardScaler` est fitté sur les données d'entraînement et bundlé avec le classifieur. À l'inférence, `model.predict()` applique automatiquement la même transformation — il est impossible d'oublier le scaler ou d'utiliser des statistiques différentes.
 
@@ -279,17 +279,17 @@ log.info("prediction", prediction="setosa", confidence=0.97, latency_ms=1.2)
 
 #### Fonctions de démarrage (exécutées une fois à l'import)
 
-| Fonction | Retour | Description |
-|---|---|---|
-| `_load_model()` | `(model, model_source)` | Tente l'URI `models:/iris-random-forest@champion`. En cas d'échec, charge le `.pkl` local. Met à jour `MODEL_REGISTRY_ACTIVE` gauge (1/0). |
-| `_load_challenger()` | `(challenger_model, challenger_source)` | Tente l'URI `models:/iris-random-forest@challenger`. Retourne `(None, None)` silencieusement si l'alias n'existe pas — l'A/B testing est alors désactivé. |
-| `_build_explainer(model)` | `(explainer, scaler)` | Extrait le classifieur du Pipeline (`named_steps["classifier"]`), crée `shap.TreeExplainer`. Retourne `(None, None)` si SHAP indisponible. |
+| Fonction                  | Retour                                  | Description                                                                                                                                               |
+| ------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_load_model()`           | `(model, model_source)`                 | Tente l'URI `models:/iris-random-forest@champion`. En cas d'échec, charge le `.pkl` local. Met à jour `MODEL_REGISTRY_ACTIVE` gauge (1/0).                |
+| `_load_challenger()`      | `(challenger_model, challenger_source)` | Tente l'URI `models:/iris-random-forest@challenger`. Retourne `(None, None)` silencieusement si l'alias n'existe pas — l'A/B testing est alors désactivé. |
+| `_build_explainer(model)` | `(explainer, scaler)`                   | Extrait le classifieur du Pipeline (`named_steps["classifier"]`), crée `shap.TreeExplainer`. Retourne `(None, None)` si SHAP indisponible.                |
 
 #### Métriques Prometheus custom
 
-| Métrique | Type | Description |
-|---|---|---|
-| `mlops_model_registry_active` | Gauge | `1` si le modèle vient du Registry MLFlow, `0` si fallback local. Déclenche l'alerte `ModelFallbackActive`. |
+| Métrique                           | Type    | Description                                                                                                                                   |
+| ---------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mlops_model_registry_active`      | Gauge   | `1` si le modèle vient du Registry MLFlow, `0` si fallback local. Déclenche l'alerte `ModelFallbackActive`.                                   |
 | `mlops_ab_requests_total{variant}` | Counter | Nombre de requêtes `/predict` par variant (`champion` ou `challenger`). Permet de calculer le débit et l'error rate par variant dans Grafana. |
 
 #### Logique de routage A/B
@@ -304,33 +304,33 @@ Comportement par défaut (`ab_traffic_split = 0.0`) : 100 % du trafic vers le ch
 
 #### Schémas Pydantic
 
-| Classe | Champs | Validations |
-|---|---|---|
-| `PredictionRequest` | `sepal_length, sepal_width, petal_length, petal_width: float` | `@field_validator` : toutes les valeurs > 0 |
-| `PredictionResponse` | `prediction: str`, `class_id: int`, `confidence: float`, `model_source: str`, `variant: str`, `latency_ms: float` | — |
-| `BatchPredictionRequest` | `items: list[PredictionRequest]` | Non vide, ≤ 1000 items |
-| `BatchPredictionResponse` | `predictions: list[PredictionResponse]`, `total: int`, `batch_latency_ms: float` | — |
-| `ExplainRequest` | `sepal_length, sepal_width, petal_length, petal_width: float` | — |
-| `ExplainResponse` | `prediction, class_id, confidence, shap_values: dict[str, float], model_source` | — |
+| Classe                    | Champs                                                                                                            | Validations                                 |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `PredictionRequest`       | `sepal_length, sepal_width, petal_length, petal_width: float`                                                     | `@field_validator` : toutes les valeurs > 0 |
+| `PredictionResponse`      | `prediction: str`, `class_id: int`, `confidence: float`, `model_source: str`, `variant: str`, `latency_ms: float` | —                                           |
+| `BatchPredictionRequest`  | `items: list[PredictionRequest]`                                                                                  | Non vide, ≤ 1000 items                      |
+| `BatchPredictionResponse` | `predictions: list[PredictionResponse]`, `total: int`, `batch_latency_ms: float`                                  | —                                           |
+| `ExplainRequest`          | `sepal_length, sepal_width, petal_length, petal_width: float`                                                     | —                                           |
+| `ExplainResponse`         | `prediction, class_id, confidence, shap_values: dict[str, float], model_source`                                   | —                                           |
 
 #### Endpoints
 
-| Méthode | Route | Auth | Fonction | Description |
-|---|---|---|---|---|
-| `GET` | `/health` | Non | `health()` | `{status, model, model_source, total_predictions}` — utilisé par Docker + K8s probes |
-| `GET` | `/metrics` | Non | `metrics()` | Métadonnées statiques du modèle (type, features, classes) |
-| `GET` | `/stats` | Non | `stats()` | Agrégats sur toutes les prédictions loguées (via `PredictionLogger.stats()`) |
-| `GET` | `/ab/status` | Non | `ab_status()` | État A/B : `{ab_enabled, traffic_split, champion: {loaded, source, alias}, challenger: {loaded, source, alias}}` |
-| `GET` | `/metrics` (Prometheus) | Non | Auto-injecté | `http_requests_total`, `http_request_duration_seconds`, etc. |
-| `POST` | `/predict` | Oui | `predict()` | Prédiction unitaire avec routage A/B. Mesure latency_ms. Logue en base. Incrémente `AB_REQUESTS`. |
-| `POST` | `/predict/batch` | Oui | `predict_batch()` | Vectorise toute la batch en une seule opération numpy. Toujours sur le champion. |
-| `POST` | `/explain` | Oui | `explain()` | SHAP values pour la classe prédite. Applique le scaler du Pipeline avant TreeExplainer. HTTP 503 si SHAP indisponible. |
+| Méthode | Route                   | Auth | Fonction          | Description                                                                                                            |
+| ------- | ----------------------- | ---- | ----------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `GET`   | `/health`               | Non  | `health()`        | `{status, model, model_source, total_predictions}` — utilisé par Docker + K8s probes                                   |
+| `GET`   | `/metrics`              | Non  | `metrics()`       | Métadonnées statiques du modèle (type, features, classes)                                                              |
+| `GET`   | `/stats`                | Non  | `stats()`         | Agrégats sur toutes les prédictions loguées (via `PredictionLogger.stats()`)                                           |
+| `GET`   | `/ab/status`            | Non  | `ab_status()`     | État A/B : `{ab_enabled, traffic_split, champion: {loaded, source, alias}, challenger: {loaded, source, alias}}`       |
+| `GET`   | `/metrics` (Prometheus) | Non  | Auto-injecté      | `http_requests_total`, `http_request_duration_seconds`, etc.                                                           |
+| `POST`  | `/predict`              | Oui  | `predict()`       | Prédiction unitaire avec routage A/B. Mesure latency_ms. Logue en base. Incrémente `AB_REQUESTS`.                      |
+| `POST`  | `/predict/batch`        | Oui  | `predict_batch()` | Vectorise toute la batch en une seule opération numpy. Toujours sur le champion.                                       |
+| `POST`  | `/explain`              | Oui  | `explain()`       | SHAP values pour la classe prédite. Applique le scaler du Pipeline avant TreeExplainer. HTTP 503 si SHAP indisponible. |
 
 #### Helpers internes
 
-| Fonction | Description |
-|---|---|
-| `_vectorize(req)` | Convertit un `PredictionRequest` en `np.ndarray` (1, 4) |
+| Fonction                 | Description                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `_vectorize(req)`        | Convertit un `PredictionRequest` en `np.ndarray` (1, 4)                                     |
 | `_route_to_challenger()` | Décision aléatoire basée sur `ab_traffic_split`. Retourne `False` si challenger non chargé. |
 
 ---
@@ -341,18 +341,18 @@ Comportement par défaut (`ab_traffic_split = 0.0`) : 100 % du trafic vers le ch
 
 #### Classe `DriftDetector`
 
-| Attribut | Type | Description |
-|---|---|---|
-| `reports_dir` | `str` | Dossier de sortie (`settings.drift_reports_dir`) |
-| `reference_data` | `pd.DataFrame` | 150 lignes Iris — baseline immuable |
+| Attribut         | Type            | Description                                                                |
+| ---------------- | --------------- | -------------------------------------------------------------------------- |
+| `reports_dir`    | `str`           | Dossier de sortie (`settings.drift_reports_dir`)                           |
+| `reference_data` | `pd.DataFrame`  | 150 lignes Iris — baseline immuable                                        |
 | `column_mapping` | `ColumnMapping` | Indique à Evidently : target = `species`, features numériques = 4 colonnes |
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `detect` | `(current_data: pd.DataFrame) → dict` | Lance `DataDriftPreset` + `DataQualityPreset`, sauvegarde HTML, retourne `{drift_detected, n_drifted_features, share_drifted, report_path, timestamp, n_samples}`. Log structuré du résultat. |
-| `build_current_data` | `(predictions_log: list[dict]) → pd.DataFrame` | Convertit la sortie de `PredictionLogger.get_recent()` en DataFrame Evidently-compatible. |
-| `simulate_drifted_data` | `(n_samples, noise_scale) → pd.DataFrame` | Génère des données artificiellement driftées (bruit gaussien) pour tests et démos. Utilise `settings.random_state`. |
-| `_build_reference` | privée | Charge Iris scikit-learn, retourne DataFrame avec colonne `species`. |
+| Méthode                 | Signature                                      | Description                                                                                                                                                                                   |
+| ----------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `detect`                | `(current_data: pd.DataFrame) → dict`          | Lance `DataDriftPreset` + `DataQualityPreset`, sauvegarde HTML, retourne `{drift_detected, n_drifted_features, share_drifted, report_path, timestamp, n_samples}`. Log structuré du résultat. |
+| `build_current_data`    | `(predictions_log: list[dict]) → pd.DataFrame` | Convertit la sortie de `PredictionLogger.get_recent()` en DataFrame Evidently-compatible.                                                                                                     |
+| `simulate_drifted_data` | `(n_samples, noise_scale) → pd.DataFrame`      | Génère des données artificiellement driftées (bruit gaussien) pour tests et démos. Utilise `settings.random_state`.                                                                           |
+| `_build_reference`      | privée                                         | Charge Iris scikit-learn, retourne DataFrame avec colonne `species`.                                                                                                                          |
 
 **Connexion avec `PredictionLogger`**
 
@@ -372,12 +372,12 @@ result = detector.detect(current_df)
 
 #### Composants `@component`
 
-| Composant | Inputs | Outputs | Description |
-|---|---|---|---|
-| `load_data` | — | `train: Dataset`, `test: Dataset` | `load_iris()` → split 80/20 → CSV |
-| `train_model` | `train: Dataset`, `n_estimators`, `max_depth` | `model: Model` | GridSearchCV sur Pipeline sklearn, sauvegarde best model + métadonnées KFP |
-| `evaluate_model` | `model: Model`, `test: Dataset`, `threshold` | `metrics: Metrics`, `bool` | accuracy + F1 → logue KFP Metrics → retourne `True` si ≥ seuil |
-| `register_model` | `model: Model`, `mlflow_uri` | — | Run MLFlow → `log_model` → Registry → alias `champion` |
+| Composant        | Inputs                                        | Outputs                           | Description                                                                |
+| ---------------- | --------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------- |
+| `load_data`      | —                                             | `train: Dataset`, `test: Dataset` | `load_iris()` → split 80/20 → CSV                                          |
+| `train_model`    | `train: Dataset`, `n_estimators`, `max_depth` | `model: Model`                    | GridSearchCV sur Pipeline sklearn, sauvegarde best model + métadonnées KFP |
+| `evaluate_model` | `model: Model`, `test: Dataset`, `threshold`  | `metrics: Metrics`, `bool`        | accuracy + F1 → logue KFP Metrics → retourne `True` si ≥ seuil             |
+| `register_model` | `model: Model`, `mlflow_uri`                  | —                                 | Run MLFlow → `log_model` → Registry → alias `champion`                     |
 
 #### Pipeline `iris_pipeline`
 
@@ -396,32 +396,32 @@ Compilation → `iris_mlops_pipeline.yaml` → soumis au cluster KFP.
 
 Charge l'app FastAPI via `TestClient`. Le modèle est chargé depuis le fallback `.pkl` local (MLFlow non requis).
 
-| Fonction | Ce qu'elle vérifie |
-|---|---|
-| `test_health()` | HTTP 200 + `status == "ok"` |
-| `test_predict_setosa()` | `prediction == "setosa"` |
-| `test_predict_virginica()` | `prediction == "virginica"` |
-| `test_metrics()` | HTTP 200 + champ `"model"` présent |
+| Fonction                   | Ce qu'elle vérifie                 |
+| -------------------------- | ---------------------------------- |
+| `test_health()`            | HTTP 200 + `status == "ok"`        |
+| `test_predict_setosa()`    | `prediction == "setosa"`           |
+| `test_predict_virginica()` | `prediction == "virginica"`        |
+| `test_metrics()`           | HTTP 200 + champ `"model"` présent |
 
 #### `tests/integration/test_api_integration.py`
 
 Nécessite que `train.py` ait été exécuté. Fixture `client` avec scope `module`.
 
-| Fonction | Ce qu'elle vérifie |
-|---|---|
-| `test_health_ok` | HTTP 200 + `status == "ok"` + `model_source` présent |
-| `test_health_reports_model_source` | `model_source` = `"local"` ou URI `models:/...` |
-| `test_metrics_endpoint_shape` | `model`, `features == 4`, 3 classes, `model_source` |
-| `test_predict_known_cases` (×3) | Setosa / versicolor / virginica correctement prédits |
-| `test_predict_response_schema` | 6 champs exacts : `prediction, class_id, confidence, model_source, variant, latency_ms` |
-| `test_predict_setosa_high_confidence` | confidence ≥ 0.80 pour setosa typique |
-| `test_predict_class_id_matches_class_name` | `class_map[class_id] == prediction` sur les 3 cas |
-| `test_predict_missing_field_returns_422` | Champ manquant → HTTP 422 |
-| `test_predict_wrong_type_returns_422` | Type invalide → HTTP 422 |
-| `test_predict_empty_body_returns_422` | Body vide → HTTP 422 |
-| `test_predict_variant_field` | `variant ∈ {"champion", "challenger"}` |
-| `test_ab_status_endpoint` | `GET /ab/status` → HTTP 200, champs `ab_enabled`, `traffic_split`, `champion`, `challenger` |
-| `test_prometheus_metrics_exposed` | `GET /metrics` → HTTP 200 |
+| Fonction                                   | Ce qu'elle vérifie                                                                          |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `test_health_ok`                           | HTTP 200 + `status == "ok"` + `model_source` présent                                        |
+| `test_health_reports_model_source`         | `model_source` = `"local"` ou URI `models:/...`                                             |
+| `test_metrics_endpoint_shape`              | `model`, `features == 4`, 3 classes, `model_source`                                         |
+| `test_predict_known_cases` (×3)            | Setosa / versicolor / virginica correctement prédits                                        |
+| `test_predict_response_schema`             | 6 champs exacts : `prediction, class_id, confidence, model_source, variant, latency_ms`     |
+| `test_predict_setosa_high_confidence`      | confidence ≥ 0.80 pour setosa typique                                                       |
+| `test_predict_class_id_matches_class_name` | `class_map[class_id] == prediction` sur les 3 cas                                           |
+| `test_predict_missing_field_returns_422`   | Champ manquant → HTTP 422                                                                   |
+| `test_predict_wrong_type_returns_422`      | Type invalide → HTTP 422                                                                    |
+| `test_predict_empty_body_returns_422`      | Body vide → HTTP 422                                                                        |
+| `test_predict_variant_field`               | `variant ∈ {"champion", "challenger"}`                                                      |
+| `test_ab_status_endpoint`                  | `GET /ab/status` → HTTP 200, champs `ab_enabled`, `traffic_split`, `champion`, `challenger` |
+| `test_prometheus_metrics_exposed`          | `GET /metrics` → HTTP 200                                                                   |
 
 #### `conftest.py`
 
@@ -433,38 +433,38 @@ Ajoute la racine du projet à `sys.path` pour résoudre les imports `from src.*`
 
 #### `docker/Dockerfile.api`
 
-| Étape | Description |
-|---|---|
-| `FROM python:3.11-slim` | Image minimale |
-| `pip install -r requirements.txt` | Installation sans cache |
-| `COPY src/ ./src/` | Tout le package `src` (config, data, api, monitoring, logging_config) |
-| `COPY models/ ./models/` | Fallback `.pkl` |
-| `RUN mkdir -p monitoring` | Crée le dossier pour SQLite predictions.db |
-| `EXPOSE 8000` | Port déclaré |
-| `CMD uvicorn src.api.main:app` | Démarrage |
+| Étape                             | Description                                                           |
+| --------------------------------- | --------------------------------------------------------------------- |
+| `FROM python:3.11-slim`           | Image minimale                                                        |
+| `pip install -r requirements.txt` | Installation sans cache                                               |
+| `COPY src/ ./src/`                | Tout le package `src` (config, data, api, monitoring, logging_config) |
+| `COPY models/ ./models/`          | Fallback `.pkl`                                                       |
+| `RUN mkdir -p monitoring`         | Crée le dossier pour SQLite predictions.db                            |
+| `EXPOSE 8000`                     | Port déclaré                                                          |
+| `CMD uvicorn src.api.main:app`    | Démarrage                                                             |
 
 #### `docker-compose.yml`
 
-| Service | Image | Port | Dépend de | Rôle |
-|---|---|---|---|---|
-| `mlflow` | `ghcr.io/mlflow/mlflow:v2.11.0` | `5000` | — | Tracking + Registry (SQLite backend, volume `mlflow_data`) |
-| `api` | Build local | `8000` | `mlflow` (healthy) | FastAPI + volume `predictions_data` pour SQLite log |
-| `prometheus` | `prom/prometheus:latest` | `9090` | `api` (healthy) | Scrape + évaluation des règles d'alerte |
-| `alertmanager` | `prom/alertmanager:latest` | `9093` | `prometheus` | Routing des alertes (Slack / email / webhook) |
-| `grafana` | `grafana/grafana:latest` | `3000` | `prometheus` | Dashboard auto-provisionné |
+| Service        | Image                           | Port   | Dépend de          | Rôle                                                       |
+| -------------- | ------------------------------- | ------ | ------------------ | ---------------------------------------------------------- |
+| `mlflow`       | `ghcr.io/mlflow/mlflow:v2.11.0` | `5000` | —                  | Tracking + Registry (SQLite backend, volume `mlflow_data`) |
+| `api`          | Build local                     | `8000` | `mlflow` (healthy) | FastAPI + volume `predictions_data` pour SQLite log        |
+| `prometheus`   | `prom/prometheus:latest`        | `9090` | `api` (healthy)    | Scrape + évaluation des règles d'alerte                    |
+| `alertmanager` | `prom/alertmanager:latest`      | `9093` | `prometheus`       | Routing des alertes (Slack / email / webhook)              |
+| `grafana`      | `grafana/grafana:latest`        | `3000` | `prometheus`       | Dashboard auto-provisionné                                 |
 
 **Volumes** : `mlflow_data`, `grafana_data`, `predictions_data` (SQLite prediction log persisté).
 
 #### `monitoring/prometheus.yml`
 
-| Section | Valeur | Description |
-|---|---|---|
-| `scrape_interval` | `15s` | Fréquence de collecte |
-| `alertmanager` target | `alertmanager:9093` | Envoi des alertes déclenchées |
-| `rule_files` | `/etc/prometheus/alert.rules.yml` | Fichier de règles monté en volume |
-| `job: mlops-api` | `api:8000` | Metrics FastAPI |
-| `job: prometheus` | `localhost:9090` | Auto-monitoring |
-| `job: alertmanager` | `alertmanager:9093` | Monitoring Alertmanager |
+| Section               | Valeur                            | Description                       |
+| --------------------- | --------------------------------- | --------------------------------- |
+| `scrape_interval`     | `15s`                             | Fréquence de collecte             |
+| `alertmanager` target | `alertmanager:9093`               | Envoi des alertes déclenchées     |
+| `rule_files`          | `/etc/prometheus/alert.rules.yml` | Fichier de règles monté en volume |
+| `job: mlops-api`      | `api:8000`                        | Metrics FastAPI                   |
+| `job: prometheus`     | `localhost:9090`                  | Auto-monitoring                   |
+| `job: alertmanager`   | `alertmanager:9093`               | Monitoring Alertmanager           |
 
 ---
 
@@ -474,41 +474,41 @@ Pipeline en **3 jobs enchaînés**.
 
 #### Job 1 : `test` (PR + push main)
 
-| Étape | Description |
-|---|---|
-| `actions/checkout@v4` | Clone le repo |
-| `actions/setup-python@v5` (3.11) | Python avec cache pip |
-| `pip install -r requirements.txt` | Dépendances |
-| `python src/training/train.py` | Entraîne le modèle (requis pour les tests) |
-| `pytest tests/ -v --cov=src --cov-fail-under=70` | Tests + coverage. Échoue si < 70%. |
-| `upload-artifact` | Publie `coverage.xml` |
+| Étape                                            | Description                                |
+| ------------------------------------------------ | ------------------------------------------ |
+| `actions/checkout@v4`                            | Clone le repo                              |
+| `actions/setup-python@v5` (3.11)                 | Python avec cache pip                      |
+| `pip install -r requirements.txt`                | Dépendances                                |
+| `python src/training/train.py`                   | Entraîne le modèle (requis pour les tests) |
+| `pytest tests/ -v --cov=src --cov-fail-under=70` | Tests + coverage. Échoue si < 70%.         |
+| `upload-artifact`                                | Publie `coverage.xml`                      |
 
 #### Job 2 : `push-image` (push main seulement, après `test`)
 
-| Étape | Description |
-|---|---|
-| `docker/login-action@v3` | Login GHCR avec `GITHUB_TOKEN` |
-| `docker/metadata-action@v5` | Génère tags `sha-XXXXXXX` + `latest` |
+| Étape                         | Description                                                   |
+| ----------------------------- | ------------------------------------------------------------- |
+| `docker/login-action@v3`      | Login GHCR avec `GITHUB_TOKEN`                                |
+| `docker/metadata-action@v5`   | Génère tags `sha-XXXXXXX` + `latest`                          |
 | `docker/build-push-action@v5` | Build + push avec cache GitHub Actions (`cache-from/to: gha`) |
 
 #### Job 3 : `security-scan` (après `push-image`)
 
-| Étape | Description |
-|---|---|
-| `aquasecurity/trivy-action` | Scan CRITICAL + HIGH sur l'image GHCR |
+| Étape                        | Description                             |
+| ---------------------------- | --------------------------------------- |
+| `aquasecurity/trivy-action`  | Scan CRITICAL + HIGH sur l'image GHCR   |
 | `codeql-action/upload-sarif` | Résultats dans l'onglet Security GitHub |
 
 #### `.pre-commit-config.yaml`
 
-| Hook | Outil | Description |
-|---|---|---|
-| `black` | 24.3.0 | Formatage (line-length=100) |
-| `isort` | 5.13.2 | Tri des imports (profil black) |
-| `ruff` | v0.4.4 | Linting + auto-fix |
-| `trailing-whitespace` | pre-commit-hooks | Espaces en fin de ligne |
+| Hook                  | Outil            | Description                        |
+| --------------------- | ---------------- | ---------------------------------- |
+| `black`               | 24.3.0           | Formatage (line-length=100)        |
+| `isort`               | 5.13.2           | Tri des imports (profil black)     |
+| `ruff`                | v0.4.4           | Linting + auto-fix                 |
+| `trailing-whitespace` | pre-commit-hooks | Espaces en fin de ligne            |
 | `no-commit-to-branch` | pre-commit-hooks | Protège `main` des commits directs |
-| `detect-private-key` | pre-commit-hooks | Empêche les commits de secrets |
-| `hadolint-docker` | v2.12.0 | Lint du Dockerfile |
+| `detect-private-key`  | pre-commit-hooks | Empêche les commits de secrets     |
+| `hadolint-docker`     | v2.12.0          | Lint du Dockerfile                 |
 
 ---
 
@@ -516,37 +516,37 @@ Pipeline en **3 jobs enchaînés**.
 
 #### `monitoring/alert.rules.yml`
 
-| Alerte | Expr PromQL | Durée | Sévérité | Description |
-|---|---|---|---|---|
-| `APIDown` | `absent(http_requests_total)` | 5 min | critical | Aucune métrique reçue |
-| `HighErrorRate` | taux 5xx > 5% | 1 min | critical | Erreurs serveur |
-| `ElevatedClientErrors` | taux 4xx > 20% | 3 min | warning | Erreurs client |
-| `SlowPredictions` | p99 /predict > 500 ms | 2 min | warning | Latence élevée |
-| `CriticalPredictionLatency` | p95 /predict > 2 s | 1 min | critical | Service dégradé |
-| `ModelFallbackActive` | `mlops_model_registry_active == 0` | 1 min | warning | Registry MLFlow inaccessible |
-| `UnexpectedTrafficSpike` | > 100 req/s sur /predict | 2 min | warning | Pic de trafic anormal |
+| Alerte                      | Expr PromQL                        | Durée | Sévérité | Description                  |
+| --------------------------- | ---------------------------------- | ----- | -------- | ---------------------------- |
+| `APIDown`                   | `absent(http_requests_total)`      | 5 min | critical | Aucune métrique reçue        |
+| `HighErrorRate`             | taux 5xx > 5%                      | 1 min | critical | Erreurs serveur              |
+| `ElevatedClientErrors`      | taux 4xx > 20%                     | 3 min | warning  | Erreurs client               |
+| `SlowPredictions`           | p99 /predict > 500 ms              | 2 min | warning  | Latence élevée               |
+| `CriticalPredictionLatency` | p95 /predict > 2 s                 | 1 min | critical | Service dégradé              |
+| `ModelFallbackActive`       | `mlops_model_registry_active == 0` | 1 min | warning  | Registry MLFlow inaccessible |
+| `UnexpectedTrafficSpike`    | > 100 req/s sur /predict           | 2 min | warning  | Pic de trafic anormal        |
 
 #### `monitoring/alertmanager.yml`
 
-| Section | Description |
-|---|---|
-| **Route critical** | group_wait 10s, repeat 15min → receiver `critical` |
-| **Route warning** | group_wait 30s, repeat 1h → receiver `default` |
-| **Inhibition** | Si `APIDown` → supprime toutes les autres alertes `mlops` |
-| **Inhibition** | Si `critical` → supprime le `warning` du même alertname |
-| **Receivers** | Webhook (template Slack / email à décommenter) |
+| Section            | Description                                               |
+| ------------------ | --------------------------------------------------------- |
+| **Route critical** | group_wait 10s, repeat 15min → receiver `critical`        |
+| **Route warning**  | group_wait 30s, repeat 1h → receiver `default`            |
+| **Inhibition**     | Si `APIDown` → supprime toutes les autres alertes `mlops` |
+| **Inhibition**     | Si `critical` → supprime le `warning` du même alertname   |
+| **Receivers**      | Webhook (template Slack / email à décommenter)            |
 
 ---
 
 ### 3.12 Kubernetes — `k8s/`
 
-| Fichier | Ressource | Description |
-|---|---|---|
-| `namespace.yml` | `Namespace` | Namespace `mlops` isolé |
-| `configmap.yml` | `ConfigMap` | Variables non-secrètes : MLFlow URI, model name, log level |
-| `deployment.yml` | `Deployment` | 2 replicas, rolling update zero-downtime (`maxUnavailable=0`), ressources CPU/RAM, readiness + liveness probes sur `/health`, PVC pour SQLite |
-| `service.yml` | `Service` + `PVC` | ClusterIP port 80→8000 + `PersistentVolumeClaim` 1Gi pour predictions.db |
-| `hpa.yml` | `HorizontalPodAutoscaler` | 2→10 pods, CPU 70%, memory 80%, scaleUp stable après 60s, scaleDown après 300s (anti-flapping) |
+| Fichier          | Ressource                 | Description                                                                                                                                   |
+| ---------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace.yml`  | `Namespace`               | Namespace `mlops` isolé                                                                                                                       |
+| `configmap.yml`  | `ConfigMap`               | Variables non-secrètes : MLFlow URI, model name, log level                                                                                    |
+| `deployment.yml` | `Deployment`              | 2 replicas, rolling update zero-downtime (`maxUnavailable=0`), ressources CPU/RAM, readiness + liveness probes sur `/health`, PVC pour SQLite |
+| `service.yml`    | `Service` + `PVC`         | ClusterIP port 80→8000 + `PersistentVolumeClaim` 1Gi pour predictions.db                                                                      |
+| `hpa.yml`        | `HorizontalPodAutoscaler` | 2→10 pods, CPU 70%, memory 80%, scaleUp stable après 60s, scaleDown après 300s (anti-flapping)                                                |
 
 > L'API Key est injectée depuis un `Secret` Kubernetes (`mlops-secrets/api-key`) — jamais en clair dans le ConfigMap.
 
@@ -800,21 +800,21 @@ Pipeline en **3 jobs enchaînés**.
 
 Toutes lues depuis `src/config.py`. Peuvent être définies dans `.env` ou passées directement.
 
-| Variable | Défaut | Utilisé dans | Description |
-|---|---|---|---|
-| `MLFLOW_TRACKING_URI` | `file:./mlruns` | train, api, kubeflow | URI du serveur MLFlow |
-| `MLFLOW_MODEL_NAME` | `iris-random-forest` | train, api | Nom du modèle dans le Registry |
-| `MLFLOW_MODEL_ALIAS` | `champion` | api | Alias du modèle à charger |
-| `MLFLOW_CHALLENGER_ALIAS` | `challenger` | api | Alias du modèle challenger pour A/B testing |
-| `AB_TRAFFIC_SPLIT` | `0.0` | api | Fraction du trafic /predict routée vers le challenger (0.0 = désactivé) |
-| `ACCURACY_THRESHOLD` | `0.90` | train | Seuil de promotion |
-| `FALLBACK_MODEL_PATH` | `models/random_forest.pkl` | train, api | Chemin du fallback local |
-| `TEST_SIZE` | `0.20` | train | Fraction du jeu de test |
-| `RANDOM_STATE` | `42` | train, preprocessing | Seed global |
-| `API_KEY` | `None` | api | Clé d'authentification (désactivée si absente) |
-| `LOG_LEVEL` | `INFO` | api, train | Niveau de log structlog |
-| `PREDICTIONS_DB_URL` | `sqlite:///monitoring/predictions.db` | api, drift | SQLite prediction log |
-| `DRIFT_REPORTS_DIR` | `monitoring/reports` | drift | Dossier des rapports HTML |
+| Variable                  | Défaut                                | Utilisé dans         | Description                                                             |
+| ------------------------- | ------------------------------------- | -------------------- | ----------------------------------------------------------------------- |
+| `MLFLOW_TRACKING_URI`     | `file:./mlruns`                       | train, api, kubeflow | URI du serveur MLFlow                                                   |
+| `MLFLOW_MODEL_NAME`       | `iris-random-forest`                  | train, api           | Nom du modèle dans le Registry                                          |
+| `MLFLOW_MODEL_ALIAS`      | `champion`                            | api                  | Alias du modèle à charger                                               |
+| `MLFLOW_CHALLENGER_ALIAS` | `challenger`                          | api                  | Alias du modèle challenger pour A/B testing                             |
+| `AB_TRAFFIC_SPLIT`        | `0.0`                                 | api                  | Fraction du trafic /predict routée vers le challenger (0.0 = désactivé) |
+| `ACCURACY_THRESHOLD`      | `0.90`                                | train                | Seuil de promotion                                                      |
+| `FALLBACK_MODEL_PATH`     | `models/random_forest.pkl`            | train, api           | Chemin du fallback local                                                |
+| `TEST_SIZE`               | `0.20`                                | train                | Fraction du jeu de test                                                 |
+| `RANDOM_STATE`            | `42`                                  | train, preprocessing | Seed global                                                             |
+| `API_KEY`                 | `None`                                | api                  | Clé d'authentification (désactivée si absente)                          |
+| `LOG_LEVEL`               | `INFO`                                | api, train           | Niveau de log structlog                                                 |
+| `PREDICTIONS_DB_URL`      | `sqlite:///monitoring/predictions.db` | api, drift           | SQLite prediction log                                                   |
+| `DRIFT_REPORTS_DIR`       | `monitoring/reports`                  | drift                | Dossier des rapports HTML                                               |
 
 ---
 
@@ -921,12 +921,39 @@ python src/monitoring/drift_detector.py
 
 # ── Kubeflow ─────────────────────────────────────────────────────────────────
 
-# Compiler le pipeline
-python kubeflow/pipeline.py  # → iris_mlops_pipeline.yaml
+1. Apply the KFP manifests
+kubectl apply -k D:\kfp
 
-# Soumettre au cluster (kfp CLI requis + cluster configuré)
-kfp run create --experiment-name iris-mlops \
-               --pipeline-package-path iris_mlops_pipeline.yaml
+2. Wait for all pods to be Running
+kubectl get pods -n kubeflow -w
+
+3. If ml-pipeline keeps crashlooping after mysql is up, patch SeaweedFS:
+kubectl patch configmap pipeline-install-config -n kubeflow --type merge -p "{\"data\":{\"objectStoreHost\":\"seaweedfs\",\"objectStorePort\":\"8333\",\"objectStoreScheme\":\"http\"}}"
+kubectl rollout restart deployment ml-pipeline -n kubeflow
+
+4. Port-forward the UI
+kubectl port-forward -n kubeflow svc/ml-pipeline-ui 8080:80
+
+ #Deploy MLflow in Kubernetes (recommended, 2 commands)
+kubectl create deployment mlflow --image=ghcr.io/mlflow/mlflow:v2.13.0 -n kubeflow -- mlflow server --host 0.0.0.0 --port 5000
+kubectl expose deployment mlflow --port=5000 --target-port=5000 --name=mlflow -n kubeflow
+
+#forward the mlfow to visualue u need it also
+kubectl port-forward -n kubeflow svc/mlflow 5000:5000
+
+
+5. Compile the pipeline
+python kubeflow/pipeline.py
+
+
+
+6. Submit the pipeline
+kfp run create --experiment-name iris-mlops --package-file iris_mlops_pipeline.yaml --watch
+
+7. Open the dashboard
+http://localhost:8080
+
+Note: keep the port-forward terminal open the whole time. mysql will take ~20 min to pull on slow internet, that is normal.
 
 # ── Kubernetes ───────────────────────────────────────────────────────────────
 

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MLOps Platform Flow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-1: #0b0f1a;
+        --bg-2: #0f1a2b;
+        --bg-3: #0a2a2a;
+        --card: #121826;
+        --ink: #e6edf7;
+        --muted: #9bb0c6;
+        --accent: #38bdf8;
+        --accent-2: #22c55e;
+        --accent-3: #f59e0b;
+        --danger: #ef4444;
+        --line: #23324a;
+        --glow: 0 0 24px rgba(56, 189, 248, 0.2);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+        background: radial-gradient(1200px 600px at 10% 10%, #0d1b2a 0%, var(--bg-1) 50%),
+          radial-gradient(900px 600px at 90% 20%, #102b3f 0%, var(--bg-2) 50%),
+          linear-gradient(140deg, var(--bg-1), var(--bg-3));
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .hero {
+        position: relative;
+        padding: 48px 24px 16px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .hero h1 {
+        font-size: clamp(28px, 4vw, 48px);
+        letter-spacing: -0.02em;
+        margin: 0 0 12px;
+      }
+
+      .hero p {
+        color: var(--muted);
+        max-width: 780px;
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .chip {
+        border: 1px solid var(--line);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--muted);
+        background: rgba(18, 24, 38, 0.6);
+        backdrop-filter: blur(6px);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+        padding: 24px;
+        max-width: 1200px;
+        margin: 0 auto 40px;
+      }
+
+      .card {
+        background: linear-gradient(180deg, rgba(18, 24, 38, 0.9), rgba(12, 16, 28, 0.95));
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        position: relative;
+        overflow: hidden;
+        transform: translateY(8px);
+        opacity: 0;
+        animation: rise 600ms ease forwards;
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: -60% -30% auto auto;
+        height: 160px;
+        width: 160px;
+        background: radial-gradient(circle at center, rgba(56, 189, 248, 0.25), transparent 70%);
+        opacity: 0.7;
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .meta {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        color: #c1d3ee;
+        background: rgba(11, 15, 26, 0.6);
+        border: 1px dashed var(--line);
+        padding: 6px 10px;
+        border-radius: 10px;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .flow {
+        max-width: 1200px;
+        margin: 0 auto 60px;
+        padding: 0 24px;
+      }
+
+      .flow h2 {
+        margin: 8px 0 18px;
+        font-size: 22px;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 18px;
+      }
+
+      .step {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px 18px;
+        background: rgba(18, 24, 38, 0.8);
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        gap: 14px;
+        align-items: start;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .step::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(56, 189, 248, 0.1), transparent 60%);
+        opacity: 0.7;
+      }
+
+      .badge {
+        height: 36px;
+        width: 36px;
+        border-radius: 10px;
+        background: rgba(56, 189, 248, 0.2);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        color: var(--accent);
+        box-shadow: var(--glow);
+      }
+
+      .step h4 {
+        margin: 0 0 6px;
+        font-size: 16px;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .callout {
+        border: 1px solid rgba(34, 197, 94, 0.4);
+        background: rgba(34, 197, 94, 0.08);
+        padding: 14px 18px;
+        border-radius: 12px;
+        margin: 18px 0 0;
+        color: #c7f0d6;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 18px 24px 40px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @keyframes rise {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .step {
+          grid-template-columns: 1fr;
+        }
+
+        .badge {
+          width: 28px;
+          height: 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <h1>MLOps Platform — End-to-End Flow</h1>
+      <p>
+        This page explains the full lifecycle of your app from data to production. It is the
+        conceptual flow only (no code), so you can understand what happens and why.
+      </p>
+      <div class="chip-row">
+        <span class="chip">Training: Kubeflow Pipelines</span>
+        <span class="chip">Registry: MLflow</span>
+        <span class="chip">Serving: FastAPI</span>
+        <span class="chip">Monitoring: Prometheus + Grafana</span>
+        <span class="chip">Drift: Evidently</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card" style="animation-delay: 0ms;">
+        <h3>1) Source of Truth</h3>
+        <p>
+          The app uses a single configuration source. Every service reads the same env variables
+          so behavior stays consistent across local, CI, and Kubernetes.
+        </p>
+        <span class="meta">Settings → ConfigMap / .env</span>
+      </article>
+
+      <article class="card" style="animation-delay: 120ms;">
+        <h3>2) Training Orchestration</h3>
+        <p>
+          Kubeflow Pipelines runs a four-step workflow: load data, train a model, evaluate it,
+          and register it when quality is good.
+        </p>
+        <span class="meta">KFP → load → train → evaluate → register</span>
+      </article>
+
+      <article class="card" style="animation-delay: 240ms;">
+        <h3>3) Model Registry</h3>
+        <p>
+          MLflow stores models as versions. When a model meets the threshold, it is promoted to
+          the “champion” alias used by the API.
+        </p>
+        <span class="meta">MLflow Registry → champion alias</span>
+      </article>
+
+      <article class="card" style="animation-delay: 360ms;">
+        <h3>4) Inference Service</h3>
+        <p>
+          FastAPI loads the “champion” model on startup. If the registry is unavailable, it
+          falls back to the local .pkl model.
+        </p>
+        <span class="meta">FastAPI → /predict /batch /explain</span>
+      </article>
+
+      <article class="card" style="animation-delay: 480ms;">
+        <h3>5) Logging & Metrics</h3>
+        <p>
+          Each prediction is stored in SQLite for drift checks. Prometheus scrapes metrics for
+          alerts and Grafana dashboards.
+        </p>
+        <span class="meta">SQLite + Prometheus + Grafana</span>
+      </article>
+
+      <article class="card" style="animation-delay: 600ms;">
+        <h3>6) Drift Detection</h3>
+        <p>
+          Evidently compares recent production data with the training baseline to detect drift.
+          If drift is found, you trigger retraining.
+        </p>
+        <span class="meta">Evidently → Drift Report</span>
+      </article>
+    </section>
+
+    <section class="flow">
+      <h2>Start-to-End Steps You Perform</h2>
+      <div class="timeline">
+        <div class="step">
+          <div class="badge">1</div>
+          <div>
+            <h4>Bring up MLflow (registry + tracking)</h4>
+            <p>
+              This is the central model store. The pipeline will register models here and the API
+              will load from here.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="badge">2</div>
+          <div>
+            <h4>Run the Kubeflow pipeline</h4>
+            <p>
+              KFP trains, evaluates, and (if accuracy is good) registers the model as the
+              “champion” alias.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="badge">3</div>
+          <div>
+            <h4>Deploy the API (Kubernetes or Docker Compose)</h4>
+            <p>
+              The API reads the “champion” model. If MLflow is unreachable, it uses the local
+              fallback model.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="badge">4</div>
+          <div>
+            <h4>Send prediction requests</h4>
+            <p>
+              Clients call /predict or /batch. The API logs each prediction and exposes metrics.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="badge">5</div>
+          <div>
+            <h4>Monitor and alert</h4>
+            <p>
+              Prometheus collects metrics and alert rules fire when errors or latency are high.
+              Grafana visualizes everything.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="badge">6</div>
+          <div>
+            <h4>Check drift and retrain when needed</h4>
+            <p>
+              Drift reports guide when to trigger another Kubeflow run to update the model.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        Tip: If KFP cannot reach MLflow, model registration fails. Make sure MLflow is reachable
+        from inside the cluster (a Service) or pass a reachable MLflow URL to the pipeline.
+      </div>
+    </section>
+
+    <footer class="footer">MLOps Platform visual flow — conceptual overview</footer>
+  </body>
+</html>
