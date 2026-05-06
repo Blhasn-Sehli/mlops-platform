@@ -32,7 +32,7 @@ jobs:
           pip install httpx
 
       - name: Train model (required before tests)
-        run: python src/training/train.py
+        run: PYTHONPATH=. python src/training/train.py
 
       - name: Run tests with coverage
         run: |
