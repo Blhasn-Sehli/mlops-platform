@@ -189,7 +189,8 @@ def register_model(
         )
         run_id = run.info.run_id
 
-    client = MlflowClient()
+    # Initialize client with tracking URI (required in Kubernetes)
+    client = MlflowClient(tracking_uri=mlflow_tracking_uri)
     versions = client.search_model_versions(f"name='{model_name}' and run_id='{run_id}'")
     if versions:
         version = versions[0].version
@@ -209,7 +210,7 @@ def register_model(
     description="End-to-end MLOps pipeline: load -> train -> evaluate -> register",
 )
 def iris_pipeline(
-    mlflow_tracking_uri: str = "http://mlflow:5000",
+    mlflow_tracking_uri: str = "http://mlflow.mlops:5000",
     n_estimators: int = 100,
     max_depth: int = 5,
     accuracy_threshold: float = 0.90,
@@ -228,7 +229,10 @@ def iris_pipeline(
         accuracy_threshold=accuracy_threshold,
     )
 
-    with dsl.Condition(eval_task.outputs["approved"]):
+    # dsl.Condition is deprecated and requires a binary comparison expression.
+    # Use dsl.If with an explicit comparison against the boolean output string.
+    # Compare to boolean True (not string) so driver receives a boolean literal
+    with dsl.If(eval_task.outputs["approved"] == True):
         register_model(
             input_model=train_task.outputs["output_model"],
             mlflow_tracking_uri=mlflow_tracking_uri,

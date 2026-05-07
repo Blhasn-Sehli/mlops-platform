@@ -934,9 +934,9 @@ kubectl rollout restart deployment ml-pipeline -n kubeflow
 4. Port-forward the UI
 kubectl port-forward -n kubeflow svc/ml-pipeline-ui 8080:80
 
- #Deploy MLflow in Kubernetes (recommended, 2 commands)
-kubectl create deployment mlflow --image=ghcr.io/mlflow/mlflow:v2.13.0 -n kubeflow -- mlflow server --host 0.0.0.0 --port 5000
-kubectl expose deployment mlflow --port=5000 --target-port=5000 --name=mlflow -n kubeflow
+#  #Deploy MLflow in Kubernetes (recommended, 2 commands)
+# kubectl create deployment mlflow --image=ghcr.io/mlflow/mlflow:v2.13.0 -n kubeflow -- mlflow server --host 0.0.0.0 --port 5000
+# kubectl expose deployment mlflow --port=5000 --target-port=5000 --name=mlflow -n kubeflow
 
 #forward the mlfow to visualue u need it also
 kubectl port-forward -n kubeflow svc/mlflow 5000:5000
@@ -963,6 +963,13 @@ kubectl apply -f k8s/configmap.yml
 kubectl apply -f k8s/service.yml
 kubectl apply -f k8s/deployment.yml
 kubectl apply -f k8s/hpa.yml
+
+kubectl create deployment mlflow --image=ghcr.io/mlflow/mlflow:v2.13.0 -n mlops -- mlflow server --host 0.0.0.0 --port 5000
+kubectl expose deployment mlflow --port=5000 --target-port=5000 --name=mlflow-service -n mlops
+
+#restart the mplos apifrom cluster 
+kubectl rollout restart deployment mlops-api -n mlops
+kubectl get pods -n mlops -w
 
 # Créer le secret API Key
 kubectl create secret generic mlops-secrets \

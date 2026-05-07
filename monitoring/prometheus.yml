@@ -16,8 +16,8 @@ rule_files:
 scrape_configs:
   - job_name: "mlops-api"
     static_configs:
-      - targets: ["api:8000"]
-    # For local dev without Docker: targets: ["host.docker.internal:8000"]
+      - targets: ["host.docker.internal:8000"]
+    # This expects: kubectl port-forward -n mlops svc/mlops-api-service 8000:80
 
   - job_name: "prometheus"
     static_configs:

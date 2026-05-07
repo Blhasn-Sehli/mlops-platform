@@ -28,7 +28,7 @@ spec:
       containers:
         - name: api
           # Replace with your GHCR image after the CI push-image job runs
-          image: ghcr.io/blhasn-sehli/mlops-platform/mlops-api:latestt
+          image: ghcr.io/blhasn-sehli/mlops-platform/mlops-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -50,10 +50,10 @@ spec:
           resources:
             requests:
               cpu: "250m"
-              memory: "256Mi"
+              memory: "512Mi"
             limits:
               cpu: "1000m"
-              memory: "512Mi"
+              memory: "1Gi" 
 
           # Readiness: only send traffic once the model is loaded
           readinessProbe:

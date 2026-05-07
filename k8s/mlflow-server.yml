@@ -1,0 +1,81 @@
+---
+# MLflow Server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+  namespace: mlops
+spec:
+  type: ClusterIP
+  selector:
+    app: mlflow-server
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+
+---
+# MLflow Server Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow-server
+  namespace: mlops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow-server
+  template:
+    metadata:
+      labels:
+        app: mlflow-server
+    spec:
+      containers:
+      - name: mlflow
+        image: mlflow-with-postgres:v3.11.1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: MLFLOW_BACKEND_STORE_URI
+          value: "postgresql://mlflow:mlflow-passwd@mlflow-postgres.mlops:5432/mlflow"
+        - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
+          value: "/mlflow-data/artifacts"
+        command:
+        - mlflow
+        - server
+        - --host
+        - "0.0.0.0"
+        - --port
+        - "5000"
+        - --backend-store-uri
+        - "postgresql://mlflow:mlflow-passwd@mlflow-postgres.mlops:5432/mlflow"
+        - --default-artifact-root
+        - "/mlflow-data/artifacts"
+        volumeMounts:
+        - name: mlflow-data
+          mountPath: /mlflow-data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: mlflow-data
+        emptyDir: {}

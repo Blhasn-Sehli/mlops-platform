@@ -1,4 +1,5 @@
 from functools import lru_cache
+import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,7 +12,12 @@ class Settings(BaseSettings):
     )
 
     # ── MLFlow ──────────────────────────────────────────────────────────────
-    mlflow_tracking_uri: str = "file:./mlruns"
+    # Default: use persistent Kubernetes MLflow if available, else local file backend
+    mlflow_tracking_uri: str = os.getenv(
+        "MLFLOW_TRACKING_URI",
+        "http://mlflow.mlops:5000"  # K8s persistent MLflow
+        if os.getenv("KUBERNETES_SERVICE_HOST") else "file:./mlruns"  # Local fallback
+    )
     mlflow_model_name: str = "iris-random-forest"
     mlflow_model_alias: str = "champion"
     mlflow_challenger_alias: str = "challenger"
